@@ -9,8 +9,6 @@ namespace NoKillPlugin
     {
         public int Version { get; set; } = 0;
 
-        public bool SomePropertyToBeSavedAndWithADefault { get; set; } = true;
-
         // the below exist just to make saving less cumbersome
 
         [NonSerialized]

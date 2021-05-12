@@ -53,7 +53,6 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="Plugin.cs" />
-    <Compile Include="PluginUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
