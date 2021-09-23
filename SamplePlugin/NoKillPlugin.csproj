@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>1.0.0.3</Version>
+    <Version>1.0.0.4</Version>
     <TargetFramework>net5.0-windows</TargetFramework>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup> 
 
   <ItemGroup>
     <Reference Include="Dalamud">
       <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ImGui.NET">
-      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\ImGui.NET.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -20,4 +20,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Release (powershell Compress-Archive -Path '$(ProjectDir)$(OutDir)$(TargetName).json', '$(ProjectDir)$(OutDir)$(TargetName).dll' -DestinationPath '$(ProjectDir)bin\$(TargetName).zip' -Force)" />
+  </Target>
 </Project>
