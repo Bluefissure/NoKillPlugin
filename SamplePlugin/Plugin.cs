@@ -5,6 +5,9 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Dalamud.Game;
+using Dalamud.IoC;
+using Dalamud.Logging;
 
 namespace NoKillPlugin
 {
@@ -14,24 +17,24 @@ namespace NoKillPlugin
 
         // private const string commandName = "/nokill";
 
-        private DalamudPluginInterface pi;
+        [PluginService] private static DalamudPluginInterface pi { get; set; }
+        [PluginService] private static SigScanner TargetModuleScanner { get; set; }
+
         private Configuration configuration;
 
         public IntPtr DemoFunc;
         private delegate char DemoFuncDelegate(Int64 a1, Int64 a2, Int64 a3);
         private Hook<DemoFuncDelegate> DemoFuncHook;
-        public void Initialize(DalamudPluginInterface pluginInterface)
+        public Plugin()
         {
-            this.pi = pluginInterface;
-
-            this.DemoFunc = this.pi.TargetModuleScanner.ScanText("40 53 48 83 EC 30 48 8B D9 49 8B C8 E8 ?? ?? ?? ?? 8B D0");
+            this.DemoFunc = TargetModuleScanner.ScanText("40 53 48 83 EC 30 48 8B D9 49 8B C8 E8 ?? ?? ?? ?? 8B D0");
             this.DemoFuncHook = new Hook<DemoFuncDelegate>(
                 DemoFunc,
                 new DemoFuncDelegate(DemoFuncDetour)
             );
 
-            this.configuration = this.pi.GetPluginConfig() as Configuration ?? new Configuration();
-            this.configuration.Initialize(this.pi);
+            this.configuration = pi.GetPluginConfig() as Configuration ?? new Configuration();
+            this.configuration.Initialize(pi);
 
             this.DemoFuncHook.Enable();
         }
@@ -61,7 +64,6 @@ namespace NoKillPlugin
         public void Dispose()
         {
             this.DemoFuncHook.Disable();
-            this.pi.Dispose();
         }
     }
 }
