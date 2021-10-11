@@ -7,6 +7,7 @@ namespace NoKillPlugin
     [Serializable]
     public class Configuration : IPluginConfiguration
     {
+        public bool SkipAuthError { get; set; } = false;
         public int Version { get; set; } = 0;
 
         // the below exist just to make saving less cumbersome

@@ -2,41 +2,58 @@
 using Dalamud.Plugin;
 using Dalamud.Hooking;
 using System;
-using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using Dalamud.Game;
 using Dalamud.IoC;
 using Dalamud.Logging;
+using Dalamud.Game.ClientState.Conditions;
 
 namespace NoKillPlugin
 {
-    public class Plugin : IDalamudPlugin
+    public class NoKillPlugin : IDalamudPlugin
     {
         public string Name => "No Kill Plugin";
 
-        // private const string commandName = "/nokill";
+        [PluginService] internal DalamudPluginInterface PluginInterface { get; set; }
+        [PluginService] internal Condition Conditions { get; set; }
+        [PluginService] internal SigScanner SigScanner { get; set; }
+        [PluginService] internal CommandManager CommandManager { get; set; }
 
-        [PluginService] private static DalamudPluginInterface pi { get; set; }
-        [PluginService] private static SigScanner TargetModuleScanner { get; set; }
+        internal static Configuration Config;
+        public PluginUi Gui { get; private set; }
 
-        private Configuration configuration;
-
-        public IntPtr DemoFunc;
+        internal IntPtr DemoFunc;
         private delegate char DemoFuncDelegate(Int64 a1, Int64 a2, Int64 a3);
         private Hook<DemoFuncDelegate> DemoFuncHook;
-        public Plugin()
+        public NoKillPlugin()
         {
-            this.DemoFunc = TargetModuleScanner.ScanText("40 53 48 83 EC 30 48 8B D9 49 8B C8 E8 ?? ?? ?? ?? 8B D0");
+            this.DemoFunc = SigScanner.ScanText("40 53 48 83 EC 30 48 8B D9 49 8B C8 E8 ?? ?? ?? ?? 8B D0");
             this.DemoFuncHook = new Hook<DemoFuncDelegate>(
                 DemoFunc,
                 new DemoFuncDelegate(DemoFuncDetour)
             );
 
-            this.configuration = pi.GetPluginConfig() as Configuration ?? new Configuration();
-            this.configuration.Initialize(pi);
+            Config = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            Config.Initialize(PluginInterface);
+
+            CommandManager.AddHandler("/nokill", new CommandInfo(CommandHandler)
+            {
+                HelpMessage = "/nokill - open the no kill plugin panel."
+            });
+
+            Gui = new PluginUi(this);
 
             this.DemoFuncHook.Enable();
+        }
+        public void CommandHandler(string command, string arguments)
+        {
+            var args = arguments.Trim().Replace("\"", string.Empty);
+
+            if (string.IsNullOrEmpty(args) || args.Equals("config", StringComparison.OrdinalIgnoreCase))
+            {
+                Gui.ConfigWindow.Visible = !Gui.ConfigWindow.Visible;
+                return;
+            }
         }
 
         private char DemoFuncDetour(Int64 a1, Int64 a2, Int64 a3)
@@ -47,15 +64,15 @@ namespace NoKillPlugin
             // PluginLog.Log($"DemoFunc a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4}");
             if(v4 > 0)
             {
-                if(v4 != 340780 || true) // Auth failed
+                // PluginLog.Log($"After DemoFunc a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4}");
+                if (v4 == 340780 && Config.SkipAuthError) // Auth failed
                 {
-                    Marshal.WriteInt64(p3 + 8, 81536);
-                    v4 = ((t1 & 0xF) > 0) ? (uint)Marshal.ReadInt32(p3 + 8) : 0;
-                    // PluginLog.Log($"After DemoFunc a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4}");
+                    PluginLog.Log($"Skip Auth Error");
                 }
                 else
                 {
-                    PluginLog.LogError($"Auth error. 账号认证失败，请重新启动游戏。");
+                    Marshal.WriteInt64(p3 + 8, 81536);
+                    v4 = ((t1 & 0xF) > 0) ? (uint)Marshal.ReadInt32(p3 + 8) : 0;
                 }
             }
             return this.DemoFuncHook.Original(a1, a2, a3);
@@ -64,6 +81,9 @@ namespace NoKillPlugin
         public void Dispose()
         {
             this.DemoFuncHook.Disable();
+            CommandManager.RemoveHandler("/nokill");
+            Gui?.Dispose();
+            PluginInterface?.Dispose();
         }
     }
 }
