@@ -29,7 +29,7 @@ namespace NoKillPlugin.Gui
         public void DrawUi()
         {
             if (Plugin.Conditions == null) return;
-            if (!Visible && Plugin.Conditions.Any())
+            if (!Visible)
             {
                 return;
             }

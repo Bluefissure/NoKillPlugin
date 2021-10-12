@@ -64,6 +64,7 @@ namespace NoKillPlugin
             // PluginLog.Log($"DemoFunc a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4}");
             if(v4 > 0)
             {
+                this.Gui.ConfigWindow.Visible = true;
                 // PluginLog.Log($"After DemoFunc a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4}");
                 if (v4 == 340780 && Config.SkipAuthError) // Auth failed
                 {
