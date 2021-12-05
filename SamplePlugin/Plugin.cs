@@ -61,21 +61,23 @@ namespace NoKillPlugin
             IntPtr p3 = new IntPtr(a3);
             var t1 = Marshal.ReadByte(p3);
             var v4 = ((t1 & 0xF) > 0) ? (uint)Marshal.ReadInt32(p3 + 8) : 0;
-            // PluginLog.Log($"DemoFunc a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4}");
+            UInt16 v4_16 = (UInt16)(v4);
+            PluginLog.Log($"DemoFunc a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4_16}");
             if(v4 > 0)
             {
                 this.Gui.ConfigWindow.Visible = true;
-                // PluginLog.Log($"After DemoFunc a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4}");
-                if (v4 == 340780 && Config.SkipAuthError) // Auth failed
+                if (v4_16 == 0x332C && Config.SkipAuthError) // Auth failed
                 {
                     PluginLog.Log($"Skip Auth Error");
                 }
                 else
                 {
-                    Marshal.WriteInt64(p3 + 8, 81536);
+                    Marshal.WriteInt64(p3 + 8, 0x3E80);
                     v4 = ((t1 & 0xF) > 0) ? (uint)Marshal.ReadInt32(p3 + 8) : 0;
+                    v4_16 = (UInt16)(v4);
                 }
             }
+            PluginLog.Log($"After DemoFunc a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4_16}");
             return this.DemoFuncHook.Original(a1, a2, a3);
         }
 

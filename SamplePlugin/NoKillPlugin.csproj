@@ -16,10 +16,10 @@
 
   <ItemGroup>
     <Reference Include="Dalamud">
-      <HintPath>..\..\..\Dalamud\Dalamud.Updater\bin\Release\6.0.0.6\Dalamud.dll</HintPath>
+      <HintPath>C:\Users\z_y_p\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
     </Reference>
     <Reference Include="ImGui.NET">
-      <HintPath>..\..\..\Dalamud\Dalamud.Updater\bin\Release\6.0.0.6\ImGui.NET.dll</HintPath>
+      <HintPath>C:\Users\z_y_p\AppData\Roaming\XIVLauncher\addon\Hooks\dev\ImGui.NET.dll</HintPath>
     </Reference>
   </ItemGroup>
 

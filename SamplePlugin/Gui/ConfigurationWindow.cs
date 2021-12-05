@@ -36,6 +36,8 @@ namespace NoKillPlugin.Gui
             ImGui.SetNextWindowSize(new Vector2(200, 100), ImGuiCond.FirstUseEver);
             if (ImGui.Begin($"{Plugin.Name} Panel", ref WindowVisible, ImGuiWindowFlags.NoScrollWithMouse))
             {
+                ImGui.TextColored(new Vector4(1, 0, 0, 1), "If you encountered lobby error in caracter selection, please restart the game.\n" +
+                    "The caracter selection menu won't be re-initialized.");
                 var SkipAuthError = Config.SkipAuthError;
                 if (ImGui.Checkbox("Skip Auth Error", ref SkipAuthError))
                 {
