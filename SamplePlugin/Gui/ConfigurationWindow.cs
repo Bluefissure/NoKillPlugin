@@ -33,17 +33,26 @@ namespace NoKillPlugin.Gui
             {
                 return;
             }
-            ImGui.SetNextWindowSize(new Vector2(200, 100), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vector2(530, 160), ImGuiCond.Appearing);
             if (ImGui.Begin($"{Plugin.Name} Panel", ref WindowVisible, ImGuiWindowFlags.NoScrollWithMouse))
             {
-                ImGui.TextColored(new Vector4(1, 0, 0, 1), "If you encountered lobby error in caracter selection, please restart the game.\n" +
-                    "The caracter selection menu won't be re-initialized.");
+                var QueueMode = Config.QueueMode;
+                if (ImGui.Checkbox("Queue Mode", ref QueueMode))
+                {
+                    Config.QueueMode = QueueMode;
+                    Config.Save();
+                }
+                if(ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Click this if you encounter lobby error while waiting in queue.");
                 var SkipAuthError = Config.SkipAuthError;
                 if (ImGui.Checkbox("Skip Auth Error", ref SkipAuthError))
                 {
                     Config.SkipAuthError = SkipAuthError;
                     Config.Save();
                 }
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Since the auth error won't be fixed until a re-login,\n" +
+                        "you should close the game and login again.");
                 ImGui.End();
             }
         }
