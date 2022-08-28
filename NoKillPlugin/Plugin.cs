@@ -113,13 +113,13 @@ namespace NoKillPlugin
             this.LobbyErrorHandlerHook.Enable();
             this.StartHandlerHook.Enable();
             this.LoginHandlerHook.Enable();
-            ChatGui.ChatMessage += OnChatMessage;
+            //ChatGui.ChatMessage += OnChatMessage;
             //this.DecodeSeStringHandlerHook.Enable();
             //this.RequestHandlerHook.Enable();
             //this.ResponseHandlerHook.Enable();
             //GameNetwork.NetworkMessage += OnNetwork;
         }
-
+        /*
         private void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
         {
             if (!Config.SaferMode)
@@ -141,6 +141,7 @@ namespace NoKillPlugin
                 }
             }
         }
+        */
         public void CommandHandler(string command, string arguments)
         {
             var args = arguments.Trim().Replace("\"", string.Empty);
@@ -220,6 +221,7 @@ namespace NoKillPlugin
             }
             return true;
         }
+        /*
         private void DecodeSeStringHandlerDetour(Int64 a1, Int64 a2, Int64 a3, Int64 a4)
         {
             if (!Config.SaferMode)
@@ -259,6 +261,7 @@ namespace NoKillPlugin
             }
             this.DecodeSeStringHandlerHook.Original(a1, a2, a3, a4);
         }
+        */
 
         private char LobbyErrorHandlerDetour(Int64 a1, Int64 a2, Int64 a3)
         {
@@ -309,7 +312,7 @@ namespace NoKillPlugin
 
         public void Dispose()
         {
-            ChatGui.ChatMessage -= OnChatMessage;
+            //ChatGui.ChatMessage -= OnChatMessage;
             this.LobbyErrorHandlerHook.Disable();
             this.StartHandlerHook.Disable();
             this.LoginHandlerHook.Disable();
