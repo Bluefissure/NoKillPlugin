@@ -31,14 +31,6 @@
       <HintPath>$(DalamudLibPath)ImGui.NET.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Lumina">
-      <HintPath>$(DalamudLibPath)Lumina.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Lumina.Excel">
-      <HintPath>$(DalamudLibPath)Lumina.Excel.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

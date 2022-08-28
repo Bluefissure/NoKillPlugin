@@ -6,17 +6,10 @@ using System.Runtime.InteropServices;
 using Dalamud.Game;
 using Dalamud.IoC;
 using Dalamud.Logging;
-using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Network;
-using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Game.Gui;
-using Dalamud.Game.Text;
-using System.Collections.Generic;
 using Dalamud.Data;
 using Dalamud.Game.ClientState;
-using Lumina.Excel.GeneratedSheets;
-using System.Text.RegularExpressions;
 
 namespace NoKillPlugin
 {
@@ -50,7 +43,7 @@ namespace NoKillPlugin
         // private delegate void ResponseHandlerDelegate(Int64 a1, Int64 a2, Int64 a3, int a4);
         private Hook<StartHandlerDelegate> StartHandlerHook;
         private Hook<LoginHandlerDelegate> LoginHandlerHook;
-        private Hook<DecodeSeStringHandlerDelegate> DecodeSeStringHandlerHook;
+        //private Hook<DecodeSeStringHandlerDelegate> DecodeSeStringHandlerHook;
         private Hook<LobbyErrorHandlerDelegate> LobbyErrorHandlerHook;
         // private Regex rx = new Regex(@"2E .. .. .. (?!03)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         /*
