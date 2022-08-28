@@ -1,25 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Version>1.0.0.4</Version>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
-
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <DalamudLibPath>$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="NoKillPlugin.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DalamudPackager" Version="2.1.8" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Dalamud">
-      <HintPath>C:\Users\z_y_p\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
+      <HintPath>$(DalamudLibPath)Dalamud.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="ImGui.NET">
-      <HintPath>C:\Users\z_y_p\AppData\Roaming\XIVLauncher\addon\Hooks\dev\ImGui.NET.dll</HintPath>
+      <HintPath>$(DalamudLibPath)ImGui.NET.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Lumina">
+      <HintPath>$(DalamudLibPath)Lumina.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Lumina.Excel">
+      <HintPath>$(DalamudLibPath)Lumina.Excel.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
 

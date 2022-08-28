@@ -9,6 +9,7 @@ namespace NoKillPlugin
     {
         public bool SkipAuthError { get; set; } = true;
         public bool QueueMode { get; set; } = false;
+        public bool SaferMode { get; set; } = true;
         public int Version { get; set; } = 0;
 
         // the below exist just to make saving less cumbersome

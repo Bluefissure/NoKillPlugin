@@ -53,6 +53,14 @@ namespace NoKillPlugin.Gui
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Since the auth error won't be fixed until a re-login,\n" +
                         "you should close the game and login again.");
+                var SaferMode = Config.SaferMode;
+                if (ImGui.Checkbox("Safer Mode", ref SaferMode))
+                {
+                    Config.SaferMode = SaferMode;
+                    Config.Save();
+                }
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Enabling this will filter invalid message that may crash your client.");
                 ImGui.End();
             }
         }

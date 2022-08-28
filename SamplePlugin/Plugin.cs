@@ -8,6 +8,15 @@ using Dalamud.IoC;
 using Dalamud.Logging;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.Network;
+using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
+using Dalamud.Game.Gui;
+using Dalamud.Game.Text;
+using System.Collections.Generic;
+using Dalamud.Data;
+using Dalamud.Game.ClientState;
+using Lumina.Excel.GeneratedSheets;
+using System.Text.RegularExpressions;
 
 namespace NoKillPlugin
 {
@@ -16,10 +25,13 @@ namespace NoKillPlugin
         public string Name => "No Kill Plugin";
 
         [PluginService] internal DalamudPluginInterface PluginInterface { get; set; }
-        [PluginService] internal Condition Conditions { get; set; }
+        [PluginService] internal Dalamud.Game.ClientState.Conditions.Condition Conditions { get; set; }
         [PluginService] internal SigScanner SigScanner { get; set; }
         [PluginService] internal CommandManager CommandManager { get; set; }
         [PluginService] internal GameNetwork GameNetwork { get; set; }
+        [PluginService] internal ChatGui ChatGui { get; set; }
+        [PluginService] internal DataManager DataManager { get; set; }
+        [PluginService] internal ClientState ClientState { get; set; }
 
         internal static Configuration Config;
         public PluginUi Gui { get; private set; }
@@ -27,16 +39,20 @@ namespace NoKillPlugin
         internal IntPtr StartHandler;
         internal IntPtr LoginHandler;
         internal IntPtr LobbyErrorHandler;
+        internal IntPtr DecodeSeStringHandler;
         // internal IntPtr RequestHandler;
         // internal IntPtr ResponseHandler;
         private delegate Int64 StartHandlerDelegate(Int64 a1, Int64 a2);
         private delegate Int64 LoginHandlerDelegate(Int64 a1, Int64 a2);
         private delegate char LobbyErrorHandlerDelegate(Int64 a1, Int64 a2, Int64 a3);
+        private delegate void DecodeSeStringHandlerDelegate(Int64 a1, Int64 a2, Int64 a3, Int64 a4);
         // private delegate char RequestHandlerDelegate(Int64 a1, int a2);
         // private delegate void ResponseHandlerDelegate(Int64 a1, Int64 a2, Int64 a3, int a4);
         private Hook<StartHandlerDelegate> StartHandlerHook;
         private Hook<LoginHandlerDelegate> LoginHandlerHook;
+        private Hook<DecodeSeStringHandlerDelegate> DecodeSeStringHandlerHook;
         private Hook<LobbyErrorHandlerDelegate> LobbyErrorHandlerHook;
+        // private Regex rx = new Regex(@"2E .. .. .. (?!03)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         /*
         private Hook<RequestHandlerDelegate> RequestHandlerHook;
         private Hook<ResponseHandlerDelegate> ResponseHandlerHook;
@@ -65,6 +81,13 @@ namespace NoKillPlugin
                 new LoginHandlerDelegate(LoginHandlerDetour)
             );
             /*
+            this.DecodeSeStringHandler = SigScanner.ScanText("E8 ?? ?? ?? ?? 8B 5E 60 48 8D 4C 24 ??");
+            this.DecodeSeStringHandlerHook = new Hook<DecodeSeStringHandlerDelegate>(
+                DecodeSeStringHandler,
+                new DecodeSeStringHandlerDelegate(DecodeSeStringHandlerDetour)
+            );
+            */
+            /*
             this.RequestHandler = SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B 9C 24 ?? ?? ?? ?? 48 8B B4 24 ?? ?? ?? ?? 83 7F 20 00");
             this.RequestHandlerHook = new Hook<RequestHandlerDelegate>(
                 RequestHandler,
@@ -90,9 +113,33 @@ namespace NoKillPlugin
             this.LobbyErrorHandlerHook.Enable();
             this.StartHandlerHook.Enable();
             this.LoginHandlerHook.Enable();
+            ChatGui.ChatMessage += OnChatMessage;
+            //this.DecodeSeStringHandlerHook.Enable();
             //this.RequestHandlerHook.Enable();
             //this.ResponseHandlerHook.Enable();
             //GameNetwork.NetworkMessage += OnNetwork;
+        }
+
+        private void OnChatMessage(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+        {
+            if (!Config.SaferMode)
+            {
+                return;
+            }
+            PluginLog.Log($"OnChatMessage: {message}");
+            foreach (var payLoad in message.Payloads)
+            {
+                if (payLoad is ItemPayload itemPayload)
+                {
+                    if ((DataManager.GetExcelSheet<EventItem>(ClientState.ClientLanguage).GetRow(itemPayload.ItemId) == null
+                        && (itemPayload.IsHQ && DataManager.GetExcelSheet<EventItem>(ClientState.ClientLanguage).GetRow(itemPayload.ItemId + 1000000) == null))
+                        && DataManager.GetExcelSheet<Item>(ClientState.ClientLanguage).GetRow(itemPayload.ItemId) == null)
+                    {
+                        PluginLog.Log($"ItemId: {itemPayload.ItemId} not found, may crash the game.");
+                        isHandled = true;
+                    }
+                }
+            }
         }
         public void CommandHandler(string command, string arguments)
         {
@@ -102,7 +149,36 @@ namespace NoKillPlugin
             {
                 Gui.ConfigWindow.Visible = !Gui.ConfigWindow.Visible;
                 return;
-            }
+            }/*
+                if (args.Equals("send1", StringComparison.OrdinalIgnoreCase))
+                {
+                    var payloadList = new List<Payload> {
+                        new UIForegroundPayload(551),
+                        new UIGlowPayload(552),
+                        new ItemPayload(100 + 1500000),
+                        new UIForegroundPayload(500),
+                        new UIGlowPayload(501),
+                        new TextPayload($"{(char) SeIconChar.LinkMarker}"),
+                        new UIForegroundPayload(0),
+                        new UIGlowPayload(0),
+                        new TextPayload("CrashItem"),
+                        new RawPayload(new byte[] {0x02, 0x27, 0x07, 0xCF, 0x01, 0x01, 0x01, 0xFF, 0x01, 0x03}),
+                        new RawPayload(new byte[] {0x02, 0x13, 0x02, 0xEC, 0x03})
+                    };
+                    ChatGui.Print("======");
+                    ChatGui.Print(new SeString(payloadList));
+                    ChatGui.Print("======");
+                }
+                if (args.Equals("send2", StringComparison.OrdinalIgnoreCase))
+                {
+                    var payloadList = new List<Payload> {
+                        new RawPayload(new byte[] {0x02, 0x2e, 0x0a, 0xc9, 0x05, 0x02, 0x02, 0x01, 0x01, 0xff, 0x02, 0x02, 0x03, 0x00}),
+                    };
+                    ChatGui.Print("======");
+                    ChatGui.Print(new SeString(payloadList));
+                    ChatGui.Print("======");
+                }
+            */
         }
 
         private Int64 StartHandlerDetour(Int64 a1, Int64 a2)
@@ -127,6 +203,61 @@ namespace NoKillPlugin
                 PluginLog.Log($"a1_2165: {a1_2165} => 0");
             }
             return this.LoginHandlerHook.Original(a1, a2);
+        }
+
+        private bool isValidSeString(byte[] managedArray, int len)
+        {
+            int i = 0;
+            while (i < len && i + 1 < len)
+            {
+                if (managedArray[i] == 0x2E)
+                {
+                    var sz = managedArray[i + 1];
+                    if (i + 1 + sz>= len) return false;
+                    if (managedArray[i + 1 + sz] != 0x03) return false;
+                }
+                i++;
+            }
+            return true;
+        }
+        private void DecodeSeStringHandlerDetour(Int64 a1, Int64 a2, Int64 a3, Int64 a4)
+        {
+            if (!Config.SaferMode)
+            {
+                this.DecodeSeStringHandlerHook.Original(a1, a2, a3, a4);
+                return;
+            }
+
+            try
+            {
+                var a2_byte = Marshal.ReadByte(new IntPtr(a2));
+                if (a2_byte == 2)
+                {
+                    var a2pointer = new IntPtr(a2);
+                    var maxlen = 256;
+                    int len = 0;
+                    while (len < maxlen && Marshal.ReadByte(a2pointer + len) != 0) len++;
+                    byte[] managedArray = new byte[len];
+                    Marshal.Copy(a2pointer, managedArray, 0, len);
+                    var bytesString = BitConverter.ToString(managedArray).Replace("-", " ");
+                    if (managedArray[0] == 0x02 && managedArray[1] == 0x2E)
+                    {
+                        if (!isValidSeString(managedArray, len))
+                        {
+                            PluginLog.Log($"invalid auto trans array:{bytesString}");
+                            return;
+                        }else
+                        {
+                            PluginLog.Log($"valid auto trans array:{bytesString}");
+                        }
+                    }
+                }
+            } catch (Exception e)
+            {
+                PluginLog.Log("Don't crash");
+                PluginLog.Log(e.StackTrace);
+            }
+            this.DecodeSeStringHandlerHook.Original(a1, a2, a3, a4);
         }
 
         private char LobbyErrorHandlerDetour(Int64 a1, Int64 a2, Int64 a3)
@@ -178,15 +309,16 @@ namespace NoKillPlugin
 
         public void Dispose()
         {
+            ChatGui.ChatMessage -= OnChatMessage;
             this.LobbyErrorHandlerHook.Disable();
             this.StartHandlerHook.Disable();
             this.LoginHandlerHook.Disable();
+            //this.DecodeSeStringHandlerHook.Disable();
             //this.RequestHandlerHook.Disable();
             //this.ResponseHandlerHook.Disable();
             //GameNetwork.NetworkMessage -= OnNetwork;
             CommandManager.RemoveHandler("/nokill");
             Gui?.Dispose();
-            PluginInterface?.Dispose();
         }
     }
 }

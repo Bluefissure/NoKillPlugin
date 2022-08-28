@@ -1,10 +1,10 @@
 {
   "Author": "Bluefissure",
   "Name": "No Kill Plugin",
-  "Description": "A simple plugin that prevent the game from killing itself.",
+  "Punchline": "Don't kill game with lobby error.",
+  "Description": "A simple plugin that prevent the game from killing itself with lobby error.",
   "InternalName": "NoKillPlugin",
-  "AssemblyVersion": "1.0.3.0",
   "RepoUrl": "https://github.com/Bluefissure/NoKillPlugin",
-  "DalamudApiLevel": 5,
+  "DalamudApiLevel": 7,
   "ApplicableVersion": "any"
 }
