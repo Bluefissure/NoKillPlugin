@@ -7,6 +7,7 @@ using ImGuiNET;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Data;
 using Dalamud.Logging;
+using System.Diagnostics;
 
 namespace NoKillPlugin.Gui
 {
@@ -51,18 +52,31 @@ namespace NoKillPlugin.Gui
                     Config.Save();
                 }
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Since the auth error won't be fixed until a re-login,\n" +
+                    ImGui.SetTooltip("Since the auth error won't be gone until a re-login,\n" +
                         "you should close the game and login again.");
-                /*
-                var SaferMode = Config.SaferMode;
-                if (ImGui.Checkbox("Safer Mode", ref SaferMode))
+
+                if (ImGui.Button("Donate"))
                 {
-                    Config.SaferMode = SaferMode;
-                    Config.Save();
+                    var noKillUrl = "https://www.google.com/search?q=no+kill+shelter";
+                    if (((int)Plugin.ClientState.ClientLanguage) > 3)
+                    {
+                        noKillUrl = "https://www.baidu.com/s?wd=%E5%AE%A0%E7%89%A9%E6%95%91%E5%8A%A9";
+                    }
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo()
+                        {
+                            FileName = noKillUrl,
+                            UseShellExecute = true,
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        PluginLog.Error(ex, "Could not open nokill url");
+                    }
                 }
-                */
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Enabling this will filter invalid message that may crash your client.");
+                    ImGui.SetTooltip("To No-kill shelters.");
                 ImGui.End();
             }
         }
