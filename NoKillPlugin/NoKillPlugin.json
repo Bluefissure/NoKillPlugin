@@ -5,5 +5,6 @@
   "Description": "A simple plugin that prevent the game from killing itself with lobby error.",
   "InternalName": "NoKillPlugin",
   "RepoUrl": "https://github.com/Bluefissure/NoKillPlugin",
+  "IconUrl": "https://raw.githubusercontent.com/Bluefissure/NoKillPlugin/master/images/icon.png",
   "ApplicableVersion": "any"
 }
