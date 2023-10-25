@@ -3,9 +3,6 @@ using Dalamud.Plugin;
 using Dalamud.Hooking;
 using System;
 using System.Runtime.InteropServices;
-using Dalamud.Game;
-using Dalamud.IoC;
-using Dalamud.Plugin.Services;
 
 namespace NoKillPlugin
 {
@@ -22,23 +19,13 @@ namespace NoKillPlugin
         internal IntPtr LoginHandler;
         internal IntPtr LobbyErrorHandler;
         internal IntPtr DecodeSeStringHandler;
-        // internal IntPtr RequestHandler;
-        // internal IntPtr ResponseHandler;
         private delegate Int64 StartHandlerDelegate(Int64 a1, Int64 a2);
         private delegate Int64 LoginHandlerDelegate(Int64 a1, Int64 a2);
         private delegate char LobbyErrorHandlerDelegate(Int64 a1, Int64 a2, Int64 a3);
         private delegate void DecodeSeStringHandlerDelegate(Int64 a1, Int64 a2, Int64 a3, Int64 a4);
-        // private delegate char RequestHandlerDelegate(Int64 a1, int a2);
-        // private delegate void ResponseHandlerDelegate(Int64 a1, Int64 a2, Int64 a3, int a4);
         private Hook<StartHandlerDelegate> StartHandlerHook;
         private Hook<LoginHandlerDelegate> LoginHandlerHook;
-        //private Hook<DecodeSeStringHandlerDelegate> DecodeSeStringHandlerHook;
         private Hook<LobbyErrorHandlerDelegate> LobbyErrorHandlerHook;
-        // private Regex rx = new Regex(@"2E .. .. .. (?!03)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        /*
-        private Hook<RequestHandlerDelegate> RequestHandlerHook;
-        private Hook<ResponseHandlerDelegate> ResponseHandlerHook;
-        */
         public NoKillPlugin(DalamudPluginInterface pluginInterface)
         {
             pluginInterface.Create<Service>();
@@ -94,22 +81,22 @@ namespace NoKillPlugin
         {
             var a1_88 = (UInt16)Marshal.ReadInt16(new IntPtr(a1 + 88));
             var a1_456 = Marshal.ReadInt32(new IntPtr(a1 + 456));
-            Service.PluginLog.Info($"Start a1_456:{a1_456}");
+            Service.PluginLog.Debug($"Start a1_456:{a1_456}");
             if (a1_456 != 0 && Config.QueueMode)
             {
                 Marshal.WriteInt32(new IntPtr(a1 + 456), 0);
-                Service.PluginLog.Info($"a1_456: {a1_456} => 0");
+                Service.PluginLog.Debug($"a1_456: {a1_456} => 0");
             }
             return this.StartHandlerHook.Original(a1, a2);
         }
         private Int64 LoginHandlerDetour(Int64 a1, Int64 a2)
         {
             var a1_2165 = Marshal.ReadByte(new IntPtr(a1 + 2165));
-            Service.PluginLog.Info($"Login a1_2165:{a1_2165}");
+            Service.PluginLog.Debug($"Login a1_2165:{a1_2165}");
             if (a1_2165 != 0 && Config.QueueMode)
             {
                 Marshal.WriteByte(new IntPtr(a1 + 2165), 0);
-                Service.PluginLog.Info($"a1_2165: {a1_2165} => 0");
+                Service.PluginLog.Debug($"a1_2165: {a1_2165} => 0");
             }
             return this.LoginHandlerHook.Original(a1, a2);
         }
@@ -121,13 +108,13 @@ namespace NoKillPlugin
             var t1 = Marshal.ReadByte(p3);
             var v4 = ((t1 & 0xF) > 0) ? (uint)Marshal.ReadInt32(p3 + 8) : 0;
             UInt16 v4_16 = (UInt16)(v4);
-            Service.PluginLog.Info($"LobbyErrorHandler a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4_16}");
+            Service.PluginLog.Debug($"LobbyErrorHandler a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4_16}");
             if (v4 > 0)
             {
                 this.Gui.ConfigWindow.Visible = true;
                 if (v4_16 == 0x332C && Config.SkipAuthError) // Auth failed
                 {
-                    Service.PluginLog.Info($"Skip Auth Error");
+                    Service.PluginLog.Debug($"Skip Auth Error");
                 }
                 else
                 {
@@ -137,7 +124,7 @@ namespace NoKillPlugin
                     v4_16 = (UInt16)(v4);
                 }
             }
-            Service.PluginLog.Info($"After LobbyErrorHandler a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4_16}");
+            Service.PluginLog.Debug($"After LobbyErrorHandler a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4_16}");
             return this.LobbyErrorHandlerHook.Original(a1, a2, a3);
         }
 
