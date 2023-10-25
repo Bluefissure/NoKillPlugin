@@ -29,7 +29,7 @@ namespace NoKillPlugin.Gui
 
         public void DrawUi()
         {
-            if (Plugin.Conditions == null) return;
+            if (Service.Conditions == null) return;
             if (!Visible)
             {
                 return;
@@ -58,7 +58,7 @@ namespace NoKillPlugin.Gui
                 if (ImGui.Button("Donate"))
                 {
                     var noKillUrl = "https://www.google.com/search?q=no+kill+shelter";
-                    if (((int)Plugin.ClientState.ClientLanguage) > 3)
+                    if (((int)Service.ClientState.ClientLanguage) > 3)
                     {
                         noKillUrl = "https://www.baidu.com/s?wd=%E5%AE%A0%E7%89%A9%E6%95%91%E5%8A%A9";
                     }
@@ -72,7 +72,7 @@ namespace NoKillPlugin.Gui
                     }
                     catch (Exception ex)
                     {
-                        PluginLog.Error(ex, "Could not open nokill url");
+                        Service.PluginLog.Error(ex, "Could not open nokill url");
                     }
                 }
                 if (ImGui.IsItemHovered())
