@@ -12,8 +12,8 @@ namespace NoKillPlugin
         {
             ConfigWindow = new ConfigurationWindow(plugin);
             _plugin = plugin;
-            _plugin.PluginInterface.UiBuilder.Draw += Draw;
-            _plugin.PluginInterface.UiBuilder.OpenConfigUi += OnOpenConfigUi;
+            Service.PluginInterface.UiBuilder.Draw += Draw;
+            Service.PluginInterface.UiBuilder.OpenConfigUi += OnOpenConfigUi;
         }
 
         private void Draw()
@@ -27,8 +27,8 @@ namespace NoKillPlugin
 
         public void Dispose()
         {
-            _plugin.PluginInterface.UiBuilder.Draw -= Draw;
-            _plugin.PluginInterface.UiBuilder.OpenConfigUi -= OnOpenConfigUi;
+            Service.PluginInterface.UiBuilder.Draw -= Draw;
+            Service.PluginInterface.UiBuilder.OpenConfigUi -= OnOpenConfigUi;
         }
     }
 }
