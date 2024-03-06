@@ -37,10 +37,10 @@ namespace NoKillPlugin
             );
             try
             {
-                this.StartHandler = Service.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? B2 01 49 8B CC");
+                this.StartHandler = Service.SigScanner.ScanText("E8 ?? ?? ?? ?? EB ?? B2 ?? 49 8B CC");
             } catch (Exception)
             {
-                this.StartHandler = Service.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? B2 01 49 8B CD");
+                this.StartHandler = Service.SigScanner.ScanText("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 41 56 48 83 EC ?? 48 8B F9 48 8B F2 48 8B 49");
             }
             this.StartHandlerHook = Service.HookProvider.HookFromAddress<StartHandlerDelegate>(
                 StartHandler,
@@ -130,9 +130,9 @@ namespace NoKillPlugin
 
         public void Dispose()
         {
-            this.LobbyErrorHandlerHook.Disable();
-            this.StartHandlerHook.Disable();
-            this.LoginHandlerHook.Disable();
+            this.LobbyErrorHandlerHook.Dispose();
+            this.StartHandlerHook.Dispose();
+            this.LoginHandlerHook.Dispose();
             Service.CommandManager.RemoveHandler("/nokill");
             Gui?.Dispose();
         }
