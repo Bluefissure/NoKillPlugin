@@ -40,7 +40,7 @@ namespace NoKillPlugin
                 this.StartHandler = Service.SigScanner.ScanText("E8 ?? ?? ?? ?? EB ?? B2 ?? 49 8B CC");
             } catch (Exception)
             {
-                this.StartHandler = Service.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? B2 01 49 8B CD");
+                this.StartHandler = Service.SigScanner.ScanText("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? 48 8B F9 48 8B F2 48 8B 49 ?? 48 85 C9");
             }
             this.StartHandlerHook = Service.HookProvider.HookFromAddress<StartHandlerDelegate>(
                 StartHandler,
