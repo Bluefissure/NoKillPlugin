@@ -31,11 +31,9 @@ namespace NoKillPlugin
         internal IntPtr StartHandler;
         internal IntPtr LoginHandler;
         internal IntPtr LobbyErrorHandler;
-        internal IntPtr DecodeSeStringHandler;
         private delegate Int64 StartHandlerDelegate(Int64 a1, Int64 a2);
         private delegate Int64 LoginHandlerDelegate(Int64 a1, Int64 a2);
         private delegate char LobbyErrorHandlerDelegate(Int64 a1, Int64 a2, Int64 a3);
-        private delegate void DecodeSeStringHandlerDelegate(Int64 a1, Int64 a2, Int64 a3, Int64 a4);
         private Hook<StartHandlerDelegate> StartHandlerHook;
         private Hook<LoginHandlerDelegate> LoginHandlerHook;
         private Hook<LobbyErrorHandlerDelegate> LobbyErrorHandlerHook;
