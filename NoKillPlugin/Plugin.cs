@@ -3,6 +3,8 @@ using Dalamud.Plugin;
 using Dalamud.Hooking;
 using System;
 using System.Runtime.InteropServices;
+using Dalamud.IoC;
+using Dalamud.Plugin.Services;
 
 namespace NoKillPlugin
 {
@@ -15,6 +17,7 @@ namespace NoKillPlugin
         internal static Configuration Config;
         public PluginUi Gui { get; private set; }
 
+
         internal IntPtr StartHandler;
         internal IntPtr LoginHandler;
         internal IntPtr LobbyErrorHandler;
@@ -26,34 +29,28 @@ namespace NoKillPlugin
         private Hook<StartHandlerDelegate> StartHandlerHook;
         private Hook<LoginHandlerDelegate> LoginHandlerHook;
         private Hook<LobbyErrorHandlerDelegate> LobbyErrorHandlerHook;
-        public NoKillPlugin(DalamudPluginInterface pluginInterface)
+        public NoKillPlugin()
         {
-            pluginInterface.Create<Service>();
+            //pluginInterface.Create<Service>();
 
             this.LobbyErrorHandler = Service.SigScanner.ScanText("40 53 48 83 EC 30 48 8B D9 49 8B C8 E8 ?? ?? ?? ?? 8B D0");
             this.LobbyErrorHandlerHook = Service.HookProvider.HookFromAddress<LobbyErrorHandlerDelegate>(
                 LobbyErrorHandler, 
                 new LobbyErrorHandlerDelegate(LobbyErrorHandlerDetour)
             );
-            try
-            {
-                this.StartHandler = Service.SigScanner.ScanText("E8 ?? ?? ?? ?? EB ?? B2 ?? 49 8B CC");
-            } catch (Exception)
-            {
-                this.StartHandler = Service.SigScanner.ScanText("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 41 56 48 83 EC ?? 48 8B F9 48 8B F2 48 8B 49");
-            }
+            this.StartHandler = Service.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 49 8B CD E8 ?? ?? ?? ?? 45 88 66 08");
             this.StartHandlerHook = Service.HookProvider.HookFromAddress<StartHandlerDelegate>(
                 StartHandler,
                 new StartHandlerDelegate(StartHandlerDetour)
             );
-            this.LoginHandler = Service.SigScanner.ScanText("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 20 0F B6 81 ?? ?? ?? ?? 40 32 FF");
+            this.LoginHandler = Service.SigScanner.ScanText("40 55 53 56 57 41 54 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 ?? ?? ?? ?? 8B B1 ?? ?? ?? ??");
             this.LoginHandlerHook = Service.HookProvider.HookFromAddress<LoginHandlerDelegate>(
                 LoginHandler,
                 new LoginHandlerDelegate(LoginHandlerDetour)
             );
 
             Config = Service.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            Config.Initialize(Service.PluginInterface);
+            // Config.Initialize(Service.PluginInterface);
 
             Service.CommandManager.AddHandler("/nokill", new CommandInfo(CommandHandler)
             {
@@ -80,23 +77,23 @@ namespace NoKillPlugin
         private Int64 StartHandlerDetour(Int64 a1, Int64 a2)
         {
             var a1_88 = (UInt16)Marshal.ReadInt16(new IntPtr(a1 + 88));
-            var a1_456 = Marshal.ReadInt32(new IntPtr(a1 + 456));
-            Service.PluginLog.Debug($"Start a1_456:{a1_456}");
-            if (a1_456 != 0 && Config.QueueMode)
+            var a1_4320 = Marshal.ReadInt32(new IntPtr(a1 + 4320));
+            Service.PluginLog.Debug($"Start a1_4320:{a1_4320}");
+            if (a1_4320 != 0 && Config.QueueMode)
             {
-                Marshal.WriteInt32(new IntPtr(a1 + 456), 0);
-                Service.PluginLog.Debug($"a1_456: {a1_456} => 0");
+                Marshal.WriteInt32(new IntPtr(a1 + 4320), 0);
+                Service.PluginLog.Debug($"a1_4320: {a1_4320} => 0");
             }
             return this.StartHandlerHook.Original(a1, a2);
         }
         private Int64 LoginHandlerDetour(Int64 a1, Int64 a2)
         {
-            var a1_2165 = Marshal.ReadByte(new IntPtr(a1 + 2165));
-            Service.PluginLog.Debug($"Login a1_2165:{a1_2165}");
-            if (a1_2165 != 0 && Config.QueueMode)
+            var a1_4321 = Marshal.ReadByte(new IntPtr(a1 + 4321));
+            Service.PluginLog.Debug($"Login a1_4321:{a1_4321}");
+            if (a1_4321 != 0 && Config.QueueMode)
             {
-                Marshal.WriteByte(new IntPtr(a1 + 2165), 0);
-                Service.PluginLog.Debug($"a1_2165: {a1_2165} => 0");
+                Marshal.WriteByte(new IntPtr(a1 + 4321), 0);
+                Service.PluginLog.Debug($"a1_4321: {a1_4321} => 0");
             }
             return this.LoginHandlerHook.Original(a1, a2);
         }

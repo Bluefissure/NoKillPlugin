@@ -12,7 +12,7 @@ namespace NoKillPlugin
 {
     internal class Service
     {
-        [PluginService] internal static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+        [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
         [PluginService] internal static ICondition Conditions { get; private set; } = null!;
         [PluginService] internal static ISigScanner SigScanner { get; private set; } = null!;
         [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
