@@ -13,7 +13,7 @@ namespace NoKillPlugin
 
         public void Save()
         {
-            Service.PluginInterface.SavePluginConfig(this);
+            NoKillPlugin.PluginInterface.SavePluginConfig(this);
         }
     }
 }

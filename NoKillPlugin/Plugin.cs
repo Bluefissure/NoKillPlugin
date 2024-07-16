@@ -3,6 +3,7 @@ using Dalamud.Plugin;
 using Dalamud.Hooking;
 using System;
 using System.Runtime.InteropServices;
+using Dalamud.Game;
 using Dalamud.IoC;
 using Dalamud.Plugin.Services;
 
@@ -12,10 +13,19 @@ namespace NoKillPlugin
     {
         public string Name => "No Kill Plugin";
 
-
-
         internal static Configuration Config;
         public PluginUi Gui { get; private set; }
+
+        [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; }
+        [PluginService] internal static ICondition Conditions { get; private set; }
+        [PluginService] internal static ISigScanner SigScanner { get; private set; }
+        [PluginService] internal static ICommandManager CommandManager { get; private set; }
+        [PluginService] internal static IGameNetwork GameNetwork { get; private set; }
+        [PluginService] internal static IChatGui ChatGui { get; private set; }
+        [PluginService] internal static IDataManager DataManager { get; private set; }
+        [PluginService] internal static IClientState ClientState { get; private set; }
+        [PluginService] internal static IGameInteropProvider HookProvider { get; private set; }
+        [PluginService] internal static IPluginLog PluginLog { get; private set; }
 
 
         internal IntPtr StartHandler;
@@ -31,28 +41,26 @@ namespace NoKillPlugin
         private Hook<LobbyErrorHandlerDelegate> LobbyErrorHandlerHook;
         public NoKillPlugin()
         {
-            //pluginInterface.Create<Service>();
-
-            this.LobbyErrorHandler = Service.SigScanner.ScanText("40 53 48 83 EC 30 48 8B D9 49 8B C8 E8 ?? ?? ?? ?? 8B D0");
-            this.LobbyErrorHandlerHook = Service.HookProvider.HookFromAddress<LobbyErrorHandlerDelegate>(
+            this.LobbyErrorHandler = SigScanner.ScanText("40 53 48 83 EC 30 48 8B D9 49 8B C8 E8 ?? ?? ?? ?? 8B D0");
+            this.LobbyErrorHandlerHook = HookProvider.HookFromAddress<LobbyErrorHandlerDelegate>(
                 LobbyErrorHandler, 
                 new LobbyErrorHandlerDelegate(LobbyErrorHandlerDetour)
             );
-            this.StartHandler = Service.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 49 8B CD E8 ?? ?? ?? ?? 45 88 66 08");
-            this.StartHandlerHook = Service.HookProvider.HookFromAddress<StartHandlerDelegate>(
+            this.StartHandler = SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 49 8B CD E8 ?? ?? ?? ?? 45 88 66 08");
+            this.StartHandlerHook = HookProvider.HookFromAddress<StartHandlerDelegate>(
                 StartHandler,
                 new StartHandlerDelegate(StartHandlerDetour)
             );
-            this.LoginHandler = Service.SigScanner.ScanText("40 55 53 56 57 41 54 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 ?? ?? ?? ?? 8B B1 ?? ?? ?? ??");
-            this.LoginHandlerHook = Service.HookProvider.HookFromAddress<LoginHandlerDelegate>(
+            this.LoginHandler = SigScanner.ScanText("40 55 53 56 57 41 54 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 ?? ?? ?? ?? 8B B1 ?? ?? ?? ??");
+            this.LoginHandlerHook = HookProvider.HookFromAddress<LoginHandlerDelegate>(
                 LoginHandler,
                 new LoginHandlerDelegate(LoginHandlerDetour)
             );
 
-            Config = Service.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            // Config.Initialize(Service.PluginInterface);
+            Config = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            // Config.Initialize(PluginInterface);
 
-            Service.CommandManager.AddHandler("/nokill", new CommandInfo(CommandHandler)
+            CommandManager.AddHandler("/nokill", new CommandInfo(CommandHandler)
             {
                 HelpMessage = "/nokill - open the no kill plugin panel."
             });
@@ -78,22 +86,22 @@ namespace NoKillPlugin
         {
             var a1_88 = (UInt16)Marshal.ReadInt16(new IntPtr(a1 + 88));
             var a1_4320 = Marshal.ReadInt32(new IntPtr(a1 + 4320));
-            Service.PluginLog.Debug($"Start a1_4320:{a1_4320}");
+            PluginLog.Debug($"Start a1_4320:{a1_4320}");
             if (a1_4320 != 0 && Config.QueueMode)
             {
                 Marshal.WriteInt32(new IntPtr(a1 + 4320), 0);
-                Service.PluginLog.Debug($"a1_4320: {a1_4320} => 0");
+                PluginLog.Debug($"a1_4320: {a1_4320} => 0");
             }
             return this.StartHandlerHook.Original(a1, a2);
         }
         private Int64 LoginHandlerDetour(Int64 a1, Int64 a2)
         {
             var a1_4321 = Marshal.ReadByte(new IntPtr(a1 + 4321));
-            Service.PluginLog.Debug($"Login a1_4321:{a1_4321}");
+            PluginLog.Debug($"Login a1_4321:{a1_4321}");
             if (a1_4321 != 0 && Config.QueueMode)
             {
                 Marshal.WriteByte(new IntPtr(a1 + 4321), 0);
-                Service.PluginLog.Debug($"a1_4321: {a1_4321} => 0");
+                PluginLog.Debug($"a1_4321: {a1_4321} => 0");
             }
             return this.LoginHandlerHook.Original(a1, a2);
         }
@@ -105,13 +113,13 @@ namespace NoKillPlugin
             var t1 = Marshal.ReadByte(p3);
             var v4 = ((t1 & 0xF) > 0) ? (uint)Marshal.ReadInt32(p3 + 8) : 0;
             UInt16 v4_16 = (UInt16)(v4);
-            Service.PluginLog.Debug($"LobbyErrorHandler a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4_16}");
+            PluginLog.Debug($"LobbyErrorHandler a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4_16}");
             if (v4 > 0)
             {
                 this.Gui.ConfigWindow.Visible = true;
                 if (v4_16 == 0x332C && Config.SkipAuthError) // Auth failed
                 {
-                    Service.PluginLog.Debug($"Skip Auth Error");
+                    PluginLog.Debug($"Skip Auth Error");
                 }
                 else
                 {
@@ -121,7 +129,7 @@ namespace NoKillPlugin
                     v4_16 = (UInt16)(v4);
                 }
             }
-            Service.PluginLog.Debug($"After LobbyErrorHandler a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4_16}");
+            PluginLog.Debug($"After LobbyErrorHandler a1:{a1} a2:{a2} a3:{a3} t1:{t1} v4:{v4_16}");
             return this.LobbyErrorHandlerHook.Original(a1, a2, a3);
         }
 
@@ -130,7 +138,7 @@ namespace NoKillPlugin
             this.LobbyErrorHandlerHook.Dispose();
             this.StartHandlerHook.Dispose();
             this.LoginHandlerHook.Dispose();
-            Service.CommandManager.RemoveHandler("/nokill");
+            CommandManager.RemoveHandler("/nokill");
             Gui?.Dispose();
         }
     }
