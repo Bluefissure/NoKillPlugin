@@ -34,8 +34,8 @@ namespace NoKillPlugin
         private delegate Int64 StartHandlerDelegate(Int64 a1, Int64 a2);
         private delegate Int64 LoginHandlerDelegate(Int64 a1, Int64 a2);
         private delegate char LobbyErrorHandlerDelegate(Int64 a1, Int64 a2, Int64 a3);
-        private Hook<StartHandlerDelegate> StartHandlerHook;
-        private Hook<LoginHandlerDelegate> LoginHandlerHook;
+        //private Hook<StartHandlerDelegate> StartHandlerHook;
+        //private Hook<LoginHandlerDelegate> LoginHandlerHook;
         private Hook<LobbyErrorHandlerDelegate> LobbyErrorHandlerHook;
         public NoKillPlugin()
         {
@@ -44,7 +44,8 @@ namespace NoKillPlugin
                 LobbyErrorHandler, 
                 new LobbyErrorHandlerDelegate(LobbyErrorHandlerDetour)
             );
-            this.StartHandler = SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 49 8B CD E8 ?? ?? ?? ?? 45 88 66 08");
+            /*
+            this.StartHandler = SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? 66 44 89 65 ??");
             this.StartHandlerHook = HookProvider.HookFromAddress<StartHandlerDelegate>(
                 StartHandler,
                 new StartHandlerDelegate(StartHandlerDetour)
@@ -54,6 +55,7 @@ namespace NoKillPlugin
                 LoginHandler,
                 new LoginHandlerDelegate(LoginHandlerDetour)
             );
+            */
 
             Config = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             // Config.Initialize(PluginInterface);
@@ -66,8 +68,8 @@ namespace NoKillPlugin
             Gui = new PluginUi(this);
 
             this.LobbyErrorHandlerHook.Enable();
-            this.StartHandlerHook.Enable();
-            this.LoginHandlerHook.Enable();
+            //this.StartHandlerHook.Enable();
+            //this.LoginHandlerHook.Enable();
         }
         public void CommandHandler(string command, string arguments)
         {
@@ -79,16 +81,16 @@ namespace NoKillPlugin
                 return;
             }
         }
-
+        /*
         private Int64 StartHandlerDetour(Int64 a1, Int64 a2)
         {
             var a1_88 = (UInt16)Marshal.ReadInt16(new IntPtr(a1 + 88));
-            var a1_4320 = Marshal.ReadInt32(new IntPtr(a1 + 4320));
-            PluginLog.Debug($"Start a1_4320:{a1_4320}");
-            if (a1_4320 != 0 && Config.QueueMode)
+            var a1_4472 = Marshal.ReadInt32(new IntPtr(a1 + 4472));
+            PluginLog.Debug($"Start a1_4472:{a1_4472}");
+            if (a1_4472 != 0 && Config.QueueMode)
             {
-                Marshal.WriteInt32(new IntPtr(a1 + 4320), 0);
-                PluginLog.Debug($"a1_4320: {a1_4320} => 0");
+                Marshal.WriteInt32(new IntPtr(a1 + 4472), 0);
+                PluginLog.Debug($"a1_4472: {a1_4472} => 0");
             }
             return this.StartHandlerHook.Original(a1, a2);
         }
@@ -103,6 +105,7 @@ namespace NoKillPlugin
             }
             return this.LoginHandlerHook.Original(a1, a2);
         }
+        */
 
 
         private char LobbyErrorHandlerDetour(Int64 a1, Int64 a2, Int64 a3)
@@ -134,8 +137,8 @@ namespace NoKillPlugin
         public void Dispose()
         {
             this.LobbyErrorHandlerHook.Dispose();
-            this.StartHandlerHook.Dispose();
-            this.LoginHandlerHook.Dispose();
+            //this.StartHandlerHook.Dispose();
+            //this.LoginHandlerHook.Dispose();
             CommandManager.RemoveHandler("/nokill");
             Gui?.Dispose();
         }

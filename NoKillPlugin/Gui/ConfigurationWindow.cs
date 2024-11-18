@@ -37,12 +37,12 @@ namespace NoKillPlugin.Gui
             ImGui.SetNextWindowSize(new Vector2(530, 160), ImGuiCond.Appearing);
             if (ImGui.Begin($"{Plugin.Name} Panel", ref WindowVisible, ImGuiWindowFlags.NoScrollWithMouse))
             {
-                var QueueMode = Config.QueueMode;
-                if (ImGui.Checkbox("Queue Mode", ref QueueMode))
-                {
-                    Config.QueueMode = QueueMode;
-                    Config.Save();
-                }
+                //var QueueMode = Config.QueueMode;
+                //if (ImGui.Checkbox("Queue Mode", ref QueueMode))
+                //{
+                //    Config.QueueMode = QueueMode;
+                //    Config.Save();
+                //}
                 if(ImGui.IsItemHovered())
                     ImGui.SetTooltip("Click this if you encounter lobby error while waiting in queue.");
                 var SkipAuthError = Config.SkipAuthError;
