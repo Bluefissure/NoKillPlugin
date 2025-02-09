@@ -3,6 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
 	<NoWarn>IDE0003</NoWarn>
 	<NoWarn>CA1416</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
@@ -31,6 +32,10 @@
     <Reference Include="ImGui.NET">
       <HintPath>$(DalamudLibPath)ImGui.NET.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="FFXIVClientStructs">
+      <HintPath>$(DalamudLibPath)FFXIVClientStructs.dll</HintPath>
+      <Private>false</Private>
     </Reference>
   </ItemGroup>
 
