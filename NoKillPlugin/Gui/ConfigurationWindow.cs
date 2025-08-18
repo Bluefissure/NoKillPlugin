@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using Dalamud.Game.Text;
-using ImGuiNET;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
-using Dalamud.Data;
-using Dalamud.Logging;
+using Dalamud.Bindings.ImGui;
 using System.Diagnostics;
 
 namespace NoKillPlugin.Gui

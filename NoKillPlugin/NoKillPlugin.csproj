@@ -1,15 +1,25 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Dalamud.NET.Sdk/13.0.0">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-	<NoWarn>IDE0003</NoWarn>
-	<NoWarn>CA1416</NoWarn>
+    <Authors>Bluefissure</Authors>
+    <Company></Company>
+    <Version>1.2.2.0</Version>
+    <Description>A Dalamud Plugin.</Description>
+    <Copyright></Copyright>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>net9.0</TargetFramework>
+    <Platforms>x64</Platforms>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
   <PropertyGroup>
     <DalamudLibPath>$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
-    <StartupObject />
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <PropertyGroup>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
@@ -20,18 +30,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DalamudPackager" Version="12.0.0" />
+    <Folder Include="Properties\" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Dalamud">
-      <HintPath>$(DalamudLibPath)Dalamud.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ImGui.NET">
-      <HintPath>$(DalamudLibPath)ImGui.NET.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
-
 </Project>
